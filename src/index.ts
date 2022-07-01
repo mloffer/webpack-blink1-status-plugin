@@ -1,6 +1,6 @@
 // @ts-expect-error no types for node-blink1
 //  https://github.com/sandeepmistry/node-blink1/pull/39
-import Blink1 from 'node-blink1';
+import { Blink1 } from 'node-blink1';
 import { Compiler, Stats } from 'webpack';
 
 type rgbValue = [number, number, number];
@@ -8,7 +8,7 @@ type rgbValue = [number, number, number];
 export class WebpackBlink1Plugin {
     // https://github.com/sandeepmistry/node-blink1
     private blink1: Blink1;
-    private readonly ignoreWarnings: boolean;
+    private readonly showWarnings: boolean;
     pluginName = 'WebpackBlink1Plugin';
 
     colors: Record<string, rgbValue> = {
@@ -19,11 +19,12 @@ export class WebpackBlink1Plugin {
         black: [0, 0, 0]
     }
 
-    constructor({
-        ignoreWarnings = false,
+    constructor(
+        showWarnings = false,
+        // time in milliseconds it takes to breathe the led in and out one cycle
         breathingPeriod = 4000
-    }) {
-        this.ignoreWarnings = ignoreWarnings;
+    ) {
+        this.showWarnings = showWarnings;
         this.initBlink1();
         this.initNodeOptions();
         this.configureBreathingPattern(breathingPeriod);
@@ -55,25 +56,23 @@ export class WebpackBlink1Plugin {
         // https://webpack.js.org/api/compiler-hooks/
         compiler.hooks.compile.tap(this.pluginName, () => this.compile());
         compiler.hooks.done.tap(this.pluginName, (stats) => this.done(stats));
-        // todo if watch, then kill the led when the plugin exits
-        // otherwise we are in build mode, turn the led green for some seconds and then off
-        //  leave red on?
-        // compiler.watchMode
-        if (compiler.watchMode) {
-
-        }
     }
 
     compile(): void {
         this.blink1.off();
+        // play pattern written to memory in configureBreathingPattern
         this.blink1.playLoop(0, 1, 0);
     }
 
+    // compiler work is done (build or watch)
     done(stats: Stats): void {
+        // errors take precedence
         if (this.hasErrors(stats)) {
             this.blink1.setRGB(...this.colors.red);
-        } else if(!this.ignoreWarnings && this.hasWarnings(stats)) {
+        // otherwise show warnings, if configured
+        } else if(this.showWarnings && this.hasWarnings(stats)) {
             this.blink1.setRGB(...this.colors.yellow);
+        // else we have a successful build
         } else {
             this.blink1.setRGB(...this.colors.green);
         }
@@ -104,5 +103,3 @@ export class WebpackBlink1Plugin {
         this.blink1.close();
     }
 }
-
-module.exports = WebpackBlink1Plugin;
