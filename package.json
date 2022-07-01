@@ -2,11 +2,11 @@
   "name": "webpack-blink1-status-plugin",
   "version": "1.0.0",
   "description": "Show the status of a Webpack build via a Thing-M blink(1)",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "node test.js"
+    "prepare": "tsc"
   },
   "keywords": [
     "blink1",
@@ -16,16 +16,20 @@
   ],
   "author": "Micah Loffer <micah.loffer@protonmail.com>",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mloffer/webpack-blink1-status-plugin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mloffer/webpack-blink1-status-plugin/issues"
+  },
+  "homepage": "https://github.com/mloffer/webpack-blink1-status-plugin",
+  "dependencies": {
+    "node-blink1": "^0.5.1"
+  },
   "devDependencies": {
     "@types/node": "^17.0.23",
     "@types/webpack": "^5.28.0",
     "typescript": "^4.6.3"
-  },
-  "repository": {
-    "type": "git",
-    "url": "todo"
-  },
-  "dependencies": {
-    "node-blink1": "^0.5.1"
   }
 }

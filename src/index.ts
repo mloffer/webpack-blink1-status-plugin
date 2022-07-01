@@ -3,13 +3,15 @@
 import Blink1 from 'node-blink1';
 import { Compiler, Stats } from 'webpack';
 
+type rgbValue = [number, number, number];
+
 export class WebpackBlink1Plugin {
     // https://github.com/sandeepmistry/node-blink1
     private blink1: Blink1;
     private readonly ignoreWarnings: boolean;
     pluginName = 'WebpackBlink1Plugin';
 
-    colors = {
+    colors: Record<string, rgbValue> = {
         red: [255, 0, 0],
         green: [0, 255, 0],
         yellow: [255, 255, 0],
@@ -27,13 +29,13 @@ export class WebpackBlink1Plugin {
         this.configureBreathingPattern(breathingPeriod);
     }
 
-    initNodeOptions() {
+    initNodeOptions(): void {
         // Explicitly call exit for ctrl+c/webstorm run/etc so that we can clean up Blink1
         process.on('SIGINT', () => process.exit());
         process.on('exit', () => this.destroy());
     }
 
-    initBlink1() {
+    initBlink1(): void {
         try {
             this.blink1 = new Blink1();
         } catch (ex) {
