@@ -3,15 +3,21 @@
 import { Blink1 } from 'node-blink1';
 import { Compiler, Stats } from 'webpack';
 
-type rgbValue = [number, number, number];
+type RGBValue = [number, number, number];
 
-export class WebpackBlink1Plugin {
+type Options = {
+    showWarnings: boolean;
+    // time in milliseconds it takes to breathe the led in and out, one cycle
+    breathingPeriod: number;
+}
+
+export class WebpackBlink1StatusPlugin {
     // https://github.com/sandeepmistry/node-blink1
     private blink1: Blink1;
     private readonly showWarnings: boolean;
-    pluginName = 'WebpackBlink1Plugin';
+    pluginName = 'WebpackBlink1StatusPlugin';
 
-    colors: Record<string, rgbValue> = {
+    colors: Record<string, RGBValue> = {
         red: [255, 0, 0],
         green: [0, 255, 0],
         yellow: [255, 255, 0],
@@ -19,15 +25,15 @@ export class WebpackBlink1Plugin {
         black: [0, 0, 0]
     }
 
-    constructor(
-        showWarnings = false,
-        // time in milliseconds it takes to breathe the led in and out one cycle
-        breathingPeriod = 4000
-    ) {
-        this.showWarnings = showWarnings;
+    constructor(options: Partial<Options> = {}) {
+        const optionsWithDefaults = Object.assign<Options, Partial<Options>>({
+            showWarnings: false,
+            breathingPeriod: 4000
+        }, options);
+        this.showWarnings = optionsWithDefaults.showWarnings;
         this.initBlink1();
         this.initNodeOptions();
-        this.configureBreathingPattern(breathingPeriod);
+        this.configureBreathingPattern(optionsWithDefaults.breathingPeriod);
     }
 
     initNodeOptions(): void {
