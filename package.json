@@ -1,6 +1,6 @@
 {
   "name": "webpack-blink1-status-plugin",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Visually communicate the status of a Webpack build via a Thing-M blink(1)",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
