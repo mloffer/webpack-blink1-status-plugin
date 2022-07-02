@@ -32,6 +32,12 @@ export class WebpackBlink1StatusPlugin {
         }, options);
         this.showWarnings = optionsWithDefaults.showWarnings;
         this.initBlink1();
+        // if registering blink1 failed, noop apply and return
+        if (!this.blink1) {
+            this.apply = () => {};
+            return;
+        }
+
         this.initNodeOptions();
         this.configureBreathingPattern(optionsWithDefaults.breathingPeriod);
     }
@@ -45,18 +51,16 @@ export class WebpackBlink1StatusPlugin {
     initBlink1(): void {
         try {
             this.blink1 = new Blink1();
+            this.blink1.enableDegamma = false;
         } catch (ex) {
-            console.log(ex);
-            process.exit();
+            console.warn(`${this.pluginName}: No Blink(1) could be found. Compiler hooks will not be registered.`);
         }
-
-        this.blink1.enableDegamma = false;
     }
 
     // Webpack.apply
     apply(compiler: Compiler): void {
         if (!compiler.hooks) {
-            throw new Error('This plugin requires Webpack 5+');
+            throw new Error(`${this.pluginName} requires Webpack 5+`);
         }
 
         // https://webpack.js.org/api/compiler-hooks/
